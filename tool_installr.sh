@@ -36,6 +36,7 @@ else
 fi
 
 # Create install_log
+cd $folder
 if [ ! -f "$logg" ]; then
     echo "install_log not found. Creating..."
     touch "$logg"
@@ -112,12 +113,13 @@ function install_apt_tools() {
 }
 
 # List out tools for apt install below
-install_apt_tools wget cowsay htop freerdp2-x11 crackmapexec neo4j bloodhound krb5-user libpam-krb5 libpam-ccreds hashcat cherrytree chisel impacket-scripts evil-winrm python3-impacket pipx responder unzip python3-pip
+install_apt_tools wget cowsay htop freerdp2-x11 crackmapexec neo4j bloodhound krb5-user libpam-krb5 libpam-ccreds hashcat cherrytree chisel impacket-scripts evil-winrm python3-impacket responder unzip python3-pip pipx
 
 echo "Finished APT installs..." | tee -a $logg
 
 # Check to see if "gitlab" folder exists in project directory and if not creates one
 # Create GitHub folder for downloads:
+cd $folder
 if [ ! -d "$git_folder" ]; then
   echo "$git_folder folder not found. Creating..."
   mkdir "$git_folder"
@@ -165,6 +167,14 @@ for repo_url in "${repo_urls[@]}"; do
   fi 
 done
 
+# Install and prepare pipx
+python3 -m pip install --user pipx
+export PATH=$PATH:~/.local/bin
+source ~/.bashrc  # Or `source ~/.zshrc` if you're using Zsh
+source ~/.zshrc  # Or `source ~/.bashrc` if you're using Bash
+pipx --version "$(get_timestamp)" | tee -a $logg
+
+
 # Install kerbrute
 echo "Installing kerbrute..."
 kerbrute_url="https://github.com/ropnop/kerbrute/releases/download/v1.0.3/kerbrute_linux_amd64"
@@ -177,20 +187,13 @@ sudo ln -s "$kerbrute_folder/kerbrute" /usr/local/bin/kerbrute
 kerbrute --version | tee -a $logg
 echo "kerbrute installation completed - $(get_timestamp)" | tee -a $logg
 
-# Install Python tools
-echo "Installing Python tools..."
-pip3 install updog || { echo "Failed to install updog"; exit 1; }
+# Install updog
+cd $folder
+echo "Installing updog ..."
+pip3 install git+https://github.com/revoltchat/updog.git || echo "Failed to install updog, continuing..."
+#pip3 install updog || { echo "Failed to install updog"; exit 1; }
 echo "Installed updog - $(get_timestamp)" | tee -a $logg
 
-cd "$git_folder/LaZagne"
-pip3 install -r requirements.txt || { echo "Failed to install LaZagne dependencies"; exit 1; }
-echo "Installed LaZagne - $(get_timestamp)" | tee -a $logg
-
-sudo python3 -m pipx install donpapi || { echo "Failed to install donpapi"; exit 1; }
-echo "Installed donpapi - $(get_timestamp)" | tee -a $logg
-
-sudo python3 -m pipx install impacket || { echo "Failed to install impacket"; exit 1; }
-echo "Installed impacket - $(get_timestamp)" | tee -a $logg
 
 # Download and extract PsTools
 pstools_url="https://download.sysinternals.com/files/PSTools.zip"
