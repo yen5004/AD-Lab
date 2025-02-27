@@ -102,7 +102,7 @@ function install_apt_tools() {
                 tool_version=$(get_tool_version $tool)
                 echo "Version of $tool: $tool_version - $(get_timestamp)" | tee -a $logg
             else
-                echo "Failed to install apt $tool - $(get_timestamp)" | tee -a $logg
+                echo "FAILED TO INSTALL APT TOOL: $tool - $(get_timestamp)" | tee -a $logg
             fi
         else
             echo "Tool $tool is already installed. $(get_timestamp)" | tee -a $logg
@@ -161,14 +161,14 @@ for repo_url in "${repo_urls[@]}"; do
   repo_name=$(basename "$repo_url" .git) # Extract repo name from URL
   if [ ! -d "$git_folder/$repo_name" ]; then
     echo "Cloning $repo_name from $repo_url... - $(get_timestamp)" | tee -a $logg
-    git clone "$repo_url" "$git_folder/$repo_name" || { echo "Failed to clone $repo_name"; exit 1; }
+    git clone "$repo_url" "$git_folder/$repo_name" || echo "FAILED TO CLONE REPO: $repo_name - $(get_timestamp)" | tee -a $logg
   else
     echo "Repo $repo_name already cloned at $git_folder/$repo_name. - $(get_timestamp)" | tee -a $logg
   fi 
 done
 
 # Install and prepare pipx
-python3 -m pip install --user pipx
+python3 -m pip install --user pipx || echo "FAILED TO INSTALL PIPX - $(get_timestamp)" | tee -a $logg
 export PATH=$PATH:~/.local/bin
 source ~/.bashrc  # Or `source ~/.zshrc` if you're using Zsh
 source ~/.zshrc  # Or `source ~/.bashrc` if you're using Bash
@@ -181,7 +181,7 @@ kerbrute_url="https://github.com/ropnop/kerbrute/releases/download/v1.0.3/kerbru
 kerbrute_folder="$git_folder/kerbrute"
 mkdir -p "$kerbrute_folder"
 cd "$kerbrute_folder"
-wget "$kerbrute_url" -O kerbrute
+wget "$kerbrute_url" -O kerbrute || echo "FAILED TO DOWNLOAD KERBRUTE - $(get_timestamp)" | tee -a $logg
 chmod +x kerbrute
 sudo ln -s "$kerbrute_folder/kerbrute" /usr/local/bin/kerbrute
 kerbrute --version | tee -a $logg
@@ -190,8 +190,7 @@ echo "kerbrute installation completed - $(get_timestamp)" | tee -a $logg
 # Install updog
 cd $folder
 echo "Installing updog ..."
-pip3 install git+https://github.com/revoltchat/updog.git || echo "Failed to install updog, continuing..."
-#pip3 install updog || { echo "Failed to install updog"; exit 1; }
+pip3 install git+https://github.com/revoltchat/updog.git || echo "FAILED TO INSTALL UPDOG - $(get_timestamp)" | tee -a $logg
 echo "Installed updog - $(get_timestamp)" | tee -a $logg
 
 
@@ -200,7 +199,7 @@ pstools_url="https://download.sysinternals.com/files/PSTools.zip"
 pstools_folder="$folder/PSTools"
 mkdir -p "$pstools_folder"
 cd "$pstools_folder"
-wget "$pstools_url" -O PSTools.zip
+wget "$pstools_url" -O PSTools.zip || echo "FAILED TO DOWNLOAD PSTOOLS - $(get_timestamp)" | tee -a $logg
 unzip PSTools.zip
 echo "PsTools download and extraction completed!" | tee -a $logg
 
@@ -209,15 +208,15 @@ sharphound_url="https://github.com/SpecterOps/SharpHound/releases/latest/downloa
 sharphound_folder="$git_folder/SharpHound_exe"
 mkdir -p "$sharphound_folder"
 cd "$sharphound_folder"
-wget "$sharphound_url" -O SharpHound.exe
+wget "$sharphound_url" -O SharpHound.exe || echo "FAILED TO DOWNLOAD SHARPHOUND.EXE - $(get_timestamp)" | tee -a $logg
 echo "SharpHound.exe download completed!" | tee -a $logg
 
 # Install mitm6
 mitm6_repo="https://github.com/dirkjanm/mitm6.git"
-mitm6_folder="$git_folder/mitm6"
-cd "$mitm6_folder"
-pip3 install -r requirements.txt || { echo "Failed to install mitm6 dependencies"; exit 1; }
-echo "mitm6 installation completed!" | tee -a $logg
+cd "$git_folder"
+git clone "$mitm6_repo"
+cd "$git_folder/mitm6"
+pip3 install -r requirements.txt || echo "FAILED TO INSTALL MITM6 - $(get_timestamp)" | tee -a $logg
+echo "Mitm6 installation completed." | tee -a $logg
 
-# Done!
-echo "All tools installed successfully - $(get_timestamp)" | tee -a $logg
+echo "Installation process complete. Logs can be found at $logg." | tee -a $logg
