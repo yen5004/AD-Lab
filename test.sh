@@ -140,6 +140,10 @@ install_apt_tools wget cowsay htop freerdp2-x11 crackmapexec neo4j bloodhound kr
 
 echo "Finished APT installs..." | tee -a $logg
 
+# upgrade pip
+/usr/bin/python3 -m pip install --upgrade pip
+
+
 # Check to see if "gitlab" folder exists in project directory and if not creates one
 # Create GitHub folder for downloads:
 cd $folder
