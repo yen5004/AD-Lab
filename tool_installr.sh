@@ -30,7 +30,7 @@ go_folder="$folder/Golang_folder"
 if [ ! -d "$folder" ]; then
   echo "$project folder not found. Creating..."
   mkdir "$folder"
-  echo "$project folder created successfully. - $(get_timestamp)" | tee -a $logg
+  echo "$project folder created successfully."
 else  
   echo "$project folder already exists. - $(get_timestamp)" | tee -a $logg
 fi
@@ -80,6 +80,28 @@ case $choice in
         ;;
 esac
 
+# Create git_folder
+cd $folder
+if [ ! -f "$git_folder" ]; then
+    echo "GitHub not found. Creating..."
+    mkdir GitHub
+    chmod 644 "$git_folder" # Secure permissions for the install log
+    echo "GitHub folder created successfully. - $(get_timestamp)" | tee -a $logg
+else
+    echo "GitHub folder already exists. - $(get_timestamp)" | tee -a $logg
+fi
+
+# Create Golang_folder
+cd $folder
+if [ ! -f "$go_folder" ]; then
+    echo "install_log not found. Creating..."
+    mkdir Golang_folder
+    chmod 644 "$logg" # Secure permissions for the install log
+    echo "Golang_folder created successfully. - $(get_timestamp)" | tee -a $logg
+else
+    echo "Golang_folder already exists. - $(get_timestamp)" | tee -a $logg
+fi
+
 # APT installs:
 echo "Begin APT installs..." | tee -a $logg
 
@@ -113,20 +135,9 @@ function install_apt_tools() {
 }
 
 # List out tools for apt install below
-install_apt_tools wget cowsay htop freerdp2-x11 crackmapexec neo4j bloodhound krb5-user libpam-krb5 libpam-ccreds hashcat cherrytree chisel impacket-scripts evil-winrm python3-impacket responder unzip python3-pip pipx
+install_apt_tools wget htop freerdp2-x11 crackmapexec neo4j bloodhound krb5-user libpam-krb5 libpam-ccreds hashcat cherrytree chisel impacket-scripts evil-winrm python3-impacket responder unzip python3-pip pipx
 
 echo "Finished APT installs..." | tee -a $logg
-
-# Check to see if "gitlab" folder exists in project directory and if not creates one
-# Create GitHub folder for downloads:
-cd $folder
-if [ ! -d "$git_folder" ]; then
-  echo "$git_folder folder not found. Creating..."
-  mkdir "$git_folder"
-  echo "$git_folder folder created successfully. - $(get_timestamp)" | tee -a $logg
-else  
-  echo "$git_folder folder already exists" | tee -a $logg
-fi
 
 # Clone and install GitHub repos:
 repo_urls=(
@@ -196,6 +207,7 @@ echo "Installed updog - $(get_timestamp)" | tee -a $logg
 
 # Download and extract PsTools
 pstools_url="https://download.sysinternals.com/files/PSTools.zip"
+cd "$folder"
 pstools_folder="$folder/PSTools"
 mkdir -p "$pstools_folder"
 cd "$pstools_folder"
@@ -204,19 +216,20 @@ unzip PSTools.zip
 echo "PsTools download and extraction completed!" | tee -a $logg
 
 # Download SharpHound.exe
+cd "$folder"
 sharphound_url="https://github.com/SpecterOps/SharpHound/releases/latest/download/SharpHound.exe"
-sharphound_folder="$git_folder/SharpHound_exe"
+sharphound_folder="$folder/SharpHound_exe"
 mkdir -p "$sharphound_folder"
 cd "$sharphound_folder"
 wget "$sharphound_url" -O SharpHound.exe || echo "FAILED TO DOWNLOAD SHARPHOUND.EXE - $(get_timestamp)" | tee -a $logg
 echo "SharpHound.exe download completed!" | tee -a $logg
 
 # Install mitm6
-mitm6_repo="https://github.com/dirkjanm/mitm6.git"
-cd "$git_folder"
-git clone "$mitm6_repo"
+"cd "$folder"
+mitm6_url="https://github.com/dirkjanm/mitm6.git"
+git clone "$mitm6_url"
 cd "$git_folder/mitm6"
 pip3 install -r requirements.txt || echo "FAILED TO INSTALL MITM6 - $(get_timestamp)" | tee -a $logg
-echo "Mitm6 installation completed." | tee -a $logg
+echo "mitm6 installation completed." | tee -a $logg
 
 echo "Installation process complete. Logs can be found at $logg." | tee -a $logg
