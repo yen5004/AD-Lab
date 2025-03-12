@@ -225,7 +225,7 @@ wget "$sharphound_url" -O SharpHound.exe || echo "FAILED TO DOWNLOAD SHARPHOUND.
 echo "SharpHound.exe download completed!" | tee -a $logg
 
 # Install mitm6
-"cd "$folder"
+cd "$folder"
 mitm6_url="https://github.com/dirkjanm/mitm6.git"
 git clone "$mitm6_url"
 cd "$git_folder/mitm6"
