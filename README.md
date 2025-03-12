@@ -1,7 +1,3 @@
-Sure! Here's the updated README with the correct script name `tool_installer.sh`:
-
----
-
 # AD-Lab
 
 This repository contains a collection of scripts and tools to assist in Active Directory (AD) Lab setups and penetration testing. The primary focus of this project is to simplify the installation and setup of recommended tools for AD Class Labs.
@@ -80,6 +76,3 @@ Once the script completes the installation, it will notify you, and you can star
 - **Permission Denied**: If you receive a permission error, make sure you have the necessary sudo privileges and try running the script with `sudo`.
 - **Missing Dependencies**: If a specific tool doesn't install properly, ensure that your system's package manager (`apt`) is up-to-date.
 
----
-
-Let me know if you'd like further customizations or if you need help with anything else!
