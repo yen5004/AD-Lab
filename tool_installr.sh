@@ -1,5 +1,5 @@
 #!/bin/bash
-# Helper script to assist in loading of recommended tools for AD Class Labs
+# Helper script to assist in loading of recommended tools for AD Class Labs & tools
 
 # Check if the script is running with sudo privileges
 if [ $(id -u) -ne 0 ]; then
@@ -83,7 +83,7 @@ esac
 # Create git_folder
 cd $folder
 if [ ! -f "$git_folder" ]; then
-    echo "GitHub not found. Creating..."
+    echo "GitHub folder not found. Creating..."
     mkdir GitHub
     chmod 644 "$git_folder" # Secure permissions for the install log
     echo "GitHub folder created successfully. - $(get_timestamp)" | tee -a $logg
@@ -94,9 +94,9 @@ fi
 # Create Golang_folder
 cd $folder
 if [ ! -f "$go_folder" ]; then
-    echo "install_log not found. Creating..."
-    mkdir Golang_folder
-    chmod 644 "$logg" # Secure permissions for the install log
+    echo "Golang_folder not found. Creating..."
+    mkdir "$Golang_folder"
+    chmod 644 "$Golang_folder" # Secure permissions for the Golang_folder
     echo "Golang_folder created successfully. - $(get_timestamp)" | tee -a $logg
 else
     echo "Golang_folder already exists. - $(get_timestamp)" | tee -a $logg
@@ -107,7 +107,7 @@ echo "Begin APT installs..." | tee -a $logg
 
 # Function to get the version of the tool dynamically
 get_tool_version() {
-    command -v $1 >/dev/null 2>&1 || { echo "Tool $1 not found"; return; }
+    command -v $1 >/dev/null 2>&1 || { echo "Tool $1 not found"; return; } | tee -a $logg
 
     version=$($1 --version 2>/dev/null || $1 -v 2>/dev/null || $1 version 2>/dev/null || echo "Version info not available")
     echo "$version"
@@ -179,11 +179,13 @@ for repo_url in "${repo_urls[@]}"; do
 done
 
 # Install and prepare pipx
+echo "installing pipx - $(get_timestamp)" | tee -a $logg
 python3 -m pip install --user pipx || echo "FAILED TO INSTALL PIPX - $(get_timestamp)" | tee -a $logg
 export PATH=$PATH:~/.local/bin
 source ~/.bashrc  # Or `source ~/.zshrc` if you're using Zsh
 source ~/.zshrc  # Or `source ~/.bashrc` if you're using Bash
 pipx --version "$(get_timestamp)" | tee -a $logg
+echo "Installed pipx - $(get_timestamp)" | tee -a $logg
 
 
 # Install kerbrute
@@ -200,7 +202,7 @@ echo "kerbrute installation completed - $(get_timestamp)" | tee -a $logg
 
 # Install updog
 cd $folder
-echo "Installing updog ..."
+echo "Installing updog ...  - $(get_timestamp)" | tee -a $logg
 pip3 install git+https://github.com/revoltchat/updog.git || echo "FAILED TO INSTALL UPDOG - $(get_timestamp)" | tee -a $logg
 echo "Installed updog - $(get_timestamp)" | tee -a $logg
 
